@@ -1,5 +1,6 @@
 import operator
 import os
+import chardet
 
 
 # 单文件夹下
@@ -46,13 +47,25 @@ def trans_file(file):
     print(' [-]成功转换文件>' + full_path)
 
 
+# 判断编码
+def detect_code(path):
+    with open(path, 'rb') as file:
+        data = file.read(2000)  # 最多2000个字符
+        dicts = chardet.detect(data)
+    return dicts
+
+
 print("[+] 正在侦测操作系统类型...")
+file_path = '/Users/kent/books/文学汇总/txt-books/transfer'
 if os.name == 'posix':
-    file_list = get_all_file('/目标文件夹')
+    file_list = get_all_file('/Users/kent/books/文学汇总/txt-books/transfer')
     for i in file_list:
+        code = detect_code(i['path'] + '/' + i['name'])
+        if code['encoding'] == 'utf-8':
+            print('utf-8编码，无需转换')
+            continue
         trans_file(i)
     print("[*] 已完全转换")
 
 else:
     print('抱歉，本脚本暂不支持windows系统...')
-
